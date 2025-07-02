@@ -370,84 +370,13 @@ export function PolicyDashboard() {
 
       {/* Policy Table */}
       <div className="px-4 lg:px-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Policy Data</CardTitle>
-                <CardDescription>
-                  Detailed view of all policies matching your filters
-                </CardDescription>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="table-limit" className="text-sm">
-                  Rows per page:
-                </Label>
-                <Select
-                  value={filters.limit.toString()}
-                  onValueChange={(value) =>
-                    updateFilter('limit', parseInt(value))
-                  }
-                >
-                  <SelectTrigger id="table-limit" className="w-[80px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <PolicyTable data={data.data} pagination={data.pagination} />
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Pagination */}
-      <div className="px-4 lg:px-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                Showing {(data.pagination.page - 1) * data.pagination.limit + 1}{' '}
-                to{' '}
-                {Math.min(
-                  data.pagination.page * data.pagination.limit,
-                  data.pagination.totalCount,
-                )}{' '}
-                of {data.pagination.totalCount} results
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    updateFilter('page', Math.max(1, filters.page - 1))
-                  }
-                  disabled={!data.pagination.hasPrevPage}
-                >
-                  Previous
-                </Button>
-                <span className="text-sm">
-                  Page {data.pagination.page} of {data.pagination.totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => updateFilter('page', filters.page + 1)}
-                  disabled={!data.pagination.hasNextPage}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <PolicyTable
+          data={data.data}
+          pagination={data.pagination}
+          onLimitChange={(limit) => updateFilter('limit', limit)}
+          currentLimit={filters.limit}
+          onPageChange={(page) => updateFilter('page', page)}
+        />
       </div>
     </div>
   );

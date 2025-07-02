@@ -10,14 +10,27 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -74,12 +87,18 @@ interface PolicyTableProps {
     clientType?: string;
     search?: string;
   };
+  onLimitChange?: (limit: number) => void;
+  currentLimit?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export function PolicyTable({
   data: propData,
   pagination: propPagination,
   filters = {},
+  onLimitChange,
+  currentLimit = 20,
+  onPageChange,
 }: PolicyTableProps) {
   const [data, setData] = useState<StandardizedPolicy[]>(propData || []);
   const [loading, setLoading] = useState(!propData);
@@ -302,15 +321,68 @@ export function PolicyTable({
     );
   }
 
-  return <PolicyDataTable columns={columns} data={data} />;
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Policy Data ({data.length} policies)</CardTitle>
+            <CardDescription>
+              Detailed view of all policies matching your filters
+            </CardDescription>
+          </div>
+          {onLimitChange && (
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="table-limit" className="text-sm">
+                Rows per page:
+              </Label>
+              <Select
+                value={currentLimit.toString()}
+                onValueChange={(value) => onLimitChange(parseInt(value))}
+              >
+                <SelectTrigger id="table-limit" className="w-[80px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <PolicyDataTable
+          columns={columns}
+          data={data}
+          pagination={propPagination}
+          onPageChange={onPageChange}
+        />
+      </CardContent>
+    </Card>
+  );
 }
 
 function PolicyDataTable<TData, TValue>({
   columns,
   data,
+  pagination,
+  onPageChange,
 }: {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pagination?: {
+    page: number;
+    limit: number;
+    totalCount: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+  onPageChange?: (page: number) => void;
 }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -326,7 +398,6 @@ function PolicyDataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -403,31 +474,49 @@ function PolicyDataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-between py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {pagination ? (
+            <>
+              Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+              {Math.min(
+                pagination.page * pagination.limit,
+                pagination.totalCount,
+              )}{' '}
+              of {pagination.totalCount} results
+            </>
+          ) : (
+            <>
+              {table.getFilteredSelectedRowModel().rows.length} of{' '}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </>
+          )}
         </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <IconChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-            <IconChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+        {pagination && onPageChange && (
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(Math.max(1, pagination.page - 1))}
+              disabled={!pagination.hasPrevPage}
+            >
+              <IconChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <span className="text-sm">
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(pagination.page + 1)}
+              disabled={!pagination.hasNextPage}
+            >
+              Next
+              <IconChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
