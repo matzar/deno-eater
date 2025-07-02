@@ -231,14 +231,16 @@ export function PolicyDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="search">Search</Label>
-                <div className="relative">
+            <div className="flex flex-wrap gap-4 items-end">
+              <div className="min-w-[200px]">
+                <Label htmlFor="search" className="text-sm font-medium">
+                  Search
+                </Label>
+                <div className="relative mt-1">
                   <IconSearch className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="search"
-                    placeholder="Search policies..."
+                    placeholder="Policy Number..."
                     className="pl-9"
                     value={filters.search}
                     onChange={(e) => updateFilter('search', e.target.value)}
@@ -246,15 +248,17 @@ export function PolicyDashboard() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Source</Label>
+              <div className="min-w-[140px]">
+                <Label htmlFor="source-select" className="text-sm font-medium">
+                  Source
+                </Label>
                 <Select
                   value={filters.source || 'all'}
                   onValueChange={(value) =>
                     updateFilter('source', value === 'all' ? '' : value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="source-select" className="mt-1">
                     <SelectValue placeholder="All Sources" />
                   </SelectTrigger>
                   <SelectContent>
@@ -265,15 +269,20 @@ export function PolicyDashboard() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label>Policy Type</Label>
+              <div className="min-w-[140px]">
+                <Label
+                  htmlFor="policy-type-select"
+                  className="text-sm font-medium"
+                >
+                  Policy Type
+                </Label>
                 <Select
                   value={filters.policyType || 'all'}
                   onValueChange={(value) =>
                     updateFilter('policyType', value === 'all' ? '' : value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="policy-type-select" className="mt-1">
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
@@ -287,15 +296,20 @@ export function PolicyDashboard() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label>Client Type</Label>
+              <div className="min-w-[140px]">
+                <Label
+                  htmlFor="client-type-select"
+                  className="text-sm font-medium"
+                >
+                  Client Type
+                </Label>
                 <Select
                   value={filters.clientType || 'all'}
                   onValueChange={(value) =>
                     updateFilter('clientType', value === 'all' ? '' : value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="client-type-select" className="mt-1">
                     <SelectValue placeholder="All Clients" />
                   </SelectTrigger>
                   <SelectContent>
@@ -309,7 +323,7 @@ export function PolicyDashboard() {
                 </Select>
               </div>
 
-              <div className="flex items-end">
+              <div>
                 <Button
                   onClick={() =>
                     setFilters({
@@ -322,7 +336,13 @@ export function PolicyDashboard() {
                     })
                   }
                   variant="outline"
-                  className="w-full"
+                  size="sm"
+                  className="mt-6"
+                  disabled={
+                    !Object.values(filters).some(
+                      (value) => value && value !== 1 && value !== 20,
+                    )
+                  }
                 >
                   Clear Filters
                 </Button>
