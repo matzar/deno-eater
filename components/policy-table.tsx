@@ -354,7 +354,7 @@ export function PolicyTable({
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <PolicyDataTable
           columns={columns}
           data={data}
@@ -412,7 +412,7 @@ function PolicyDataTable<TData, TValue>({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center pb-4">
         <Input
           placeholder="Filter policy numbers..."
           value={
