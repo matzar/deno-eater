@@ -98,6 +98,10 @@ export function PolicyDashboard() {
   const [data, setData] = useState<PolicyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fullBreakdowns, setFullBreakdowns] = useState<{
+    policyTypes: string[];
+    clientTypes: string[];
+  }>({ policyTypes: [], clientTypes: [] });
   const [filters, setFilters] = useState<PolicyFilters>({
     page: 1,
     limit: 20,
@@ -129,6 +133,23 @@ export function PolicyDashboard() {
       const result = await response.json();
       if (result.success) {
         setData(result);
+
+        // If this is the first load (no filters applied), store the full breakdowns
+        if (
+          !filters.policyType &&
+          !filters.clientType &&
+          !filters.search &&
+          !filters.source
+        ) {
+          setFullBreakdowns({
+            policyTypes: Object.keys(
+              result.statistics.policyTypeBreakdown || {},
+            ),
+            clientTypes: Object.keys(
+              result.statistics.clientTypeBreakdown || {},
+            ),
+          });
+        }
       } else {
         throw new Error(result.error || 'Failed to fetch data');
       }
@@ -256,14 +277,11 @@ export function PolicyDashboard() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Types</SelectItem>
-                    {data.statistics.policyTypeBreakdown &&
-                      Object.keys(data.statistics.policyTypeBreakdown).map(
-                        (type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ),
-                      )}
+                    {fullBreakdowns.policyTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -281,14 +299,11 @@ export function PolicyDashboard() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Clients</SelectItem>
-                    {data.statistics.clientTypeBreakdown &&
-                      Object.keys(data.statistics.clientTypeBreakdown).map(
-                        (type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ),
-                      )}
+                    {fullBreakdowns.clientTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
