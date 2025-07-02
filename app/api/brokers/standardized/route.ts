@@ -155,7 +155,50 @@ export async function GET(request: Request) {
       }
     });
 
-    // Apply filters
+    // Helper function to parse dates in DD/MM/YYYY format
+    const parseDate = (dateString: string): Date | null => {
+      if (!dateString || dateString.toLowerCase() === 'not known') return null;
+
+      const dateParts = dateString.split('/');
+      if (dateParts.length === 3) {
+        const day = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed
+        const year = parseInt(dateParts[2]);
+        return new Date(year, month, day);
+      }
+      return null;
+    };
+
+    // Helper function to check if a policy is active
+    const isPolicyActive = (policy: StandardizedPolicy): boolean => {
+      const currentDate = new Date();
+      const startDate = parseDate(policy.startDate);
+      const renewalDate = parseDate(policy.renewalDate);
+
+      if (!startDate || !renewalDate) return false;
+
+      // Active if start date has passed AND renewal date is in the future
+      return startDate <= currentDate && renewalDate > currentDate;
+    };
+
+    // Helper function to calculate policy duration in days
+    const calculatePolicyDuration = (
+      policy: StandardizedPolicy,
+    ): number | null => {
+      const startDate = parseDate(policy.startDate);
+      const endDate = parseDate(policy.endDate);
+
+      if (!startDate || !endDate) return null;
+
+      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    };
+
+    // Filter active policies first for active policy statistics
+    const activePolicies = standardizedData.filter(isPolicyActive);
+
+    // Apply user filters to all data
     let filteredData = standardizedData;
 
     if (policyType) {
@@ -195,7 +238,38 @@ export async function GET(request: Request) {
     const skip = (page - 1) * limit;
     const paginatedData = filteredData.slice(skip, skip + limit);
 
-    // Calculate summary statistics
+    // Calculate active policy statistics
+    const activePolicyDurations = activePolicies
+      .map(calculatePolicyDuration)
+      .filter((duration): duration is number => duration !== null);
+
+    const uniqueActiveCustomers = new Set(
+      activePolicies.map((policy) => policy.clientRef).filter((ref) => ref),
+    );
+
+    const activePolicyStats = {
+      totalActivePolicies: activePolicies.length,
+      totalActiveCustomers: uniqueActiveCustomers.size,
+      totalActiveInsuredAmount: activePolicies.reduce(
+        (sum, policy) => sum + (policy.insuredAmount || 0),
+        0,
+      ),
+      averageActivePolicyDuration:
+        activePolicyDurations.length > 0
+          ? Math.round(
+              activePolicyDurations.reduce(
+                (sum, duration) => sum + duration,
+                0,
+              ) / activePolicyDurations.length,
+            )
+          : 0,
+      activePoliciesBySource: {
+        broker1: activePolicies.filter((p) => p.source === 'broker1').length,
+        broker2: activePolicies.filter((p) => p.source === 'broker2').length,
+      },
+    };
+
+    // Calculate summary statistics for filtered data (all policies matching user filters)
     const stats = {
       totalPolicies: totalCount,
       totalInsuredAmount: filteredData.reduce(
@@ -226,6 +300,7 @@ export async function GET(request: Request) {
         broker1: filteredData.filter((p) => p.source === 'broker1').length,
         broker2: filteredData.filter((p) => p.source === 'broker2').length,
       },
+      activePolicies: activePolicyStats,
     };
 
     // Calculate breakdowns
@@ -257,6 +332,21 @@ export async function GET(request: Request) {
       statistics: stats,
       metadata: {
         lastUpdated: new Date().toISOString(),
+        totalPoliciesAcrossAllSources: standardizedData.length,
+        activePoliciesPercentage:
+          standardizedData.length > 0
+            ? Math.round(
+                (activePolicies.length / standardizedData.length) * 100,
+              )
+            : 0,
+        dataQuality: {
+          policiesWithValidDates: standardizedData.filter(
+            (p) => parseDate(p.startDate) && parseDate(p.renewalDate),
+          ).length,
+          policiesWithMissingData: standardizedData.filter(
+            (p) => !parseDate(p.startDate) || !parseDate(p.renewalDate),
+          ).length,
+        },
         sources: results.map((result, index) => ({
           source:
             (!source && index === 0) || source === 'broker1'
