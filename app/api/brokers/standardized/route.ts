@@ -1,3 +1,14 @@
+import { Broker1Document, Broker2Document } from '@/app/api/brokers/types';
+
+// API Response types
+interface BrokerApiResponse {
+  success: boolean;
+  documents?: (Broker1Document | Broker2Document)[];
+  documentCount?: number;
+  error?: string;
+  source?: string;
+}
+
 // Standardized field mapping interface
 interface StandardizedPolicy {
   id: string;
@@ -27,7 +38,7 @@ interface StandardizedPolicy {
 }
 
 // Helper function to safely parse numeric values
-function safeParseNumber(value: any): number {
+function safeParseNumber(value: unknown): number {
   if (
     value === null ||
     value === undefined ||
@@ -42,7 +53,7 @@ function safeParseNumber(value: any): number {
 }
 
 // Field mapping functions
-function standardizeBroker1Data(document: any): StandardizedPolicy {
+function standardizeBroker1Data(document: Broker1Document): StandardizedPolicy {
   return {
     id: document._id,
     source: 'broker1',
@@ -71,7 +82,7 @@ function standardizeBroker1Data(document: any): StandardizedPolicy {
   };
 }
 
-function standardizeBroker2Data(document: any): StandardizedPolicy {
+function standardizeBroker2Data(document: Broker2Document): StandardizedPolicy {
   return {
     id: document._id,
     source: 'broker2',
@@ -116,33 +127,37 @@ export async function GET(request: Request) {
         ? 'https://your-domain.com'
         : 'http://localhost:3000';
 
-    const promises = [];
+    const promises: Promise<BrokerApiResponse>[] = [];
 
     if (!source || source === 'broker1') {
       promises.push(
         fetch(`${baseUrl}/api/broker1`)
-          .then((res) => res.json())
-          .catch((err) => ({
-            success: false,
-            error: err.message,
-            source: 'broker1',
-          })),
+          .then((res) => res.json() as Promise<BrokerApiResponse>)
+          .catch(
+            (err): BrokerApiResponse => ({
+              success: false,
+              error: err.message,
+              source: 'broker1',
+            }),
+          ),
       );
     }
 
     if (!source || source === 'broker2') {
       promises.push(
         fetch(`${baseUrl}/api/broker2`)
-          .then((res) => res.json())
-          .catch((err) => ({
-            success: false,
-            error: err.message,
-            source: 'broker2',
-          })),
+          .then((res) => res.json() as Promise<BrokerApiResponse>)
+          .catch(
+            (err): BrokerApiResponse => ({
+              success: false,
+              error: err.message,
+              source: 'broker2',
+            }),
+          ),
       );
     }
 
-    const results = await Promise.all(promises);
+    const results: BrokerApiResponse[] = await Promise.all(promises);
 
     // Combine and standardize data
     let standardizedData: StandardizedPolicy[] = [];
@@ -153,18 +168,21 @@ export async function GET(request: Request) {
         const isBroker1 = (!source && isFirstResult) || source === 'broker1';
 
         const standardized = result.documents
-          .filter((doc: any) => doc && Object.keys(doc).length > 1) // Filter out incomplete documents
-          .map((doc: any) => {
+          .filter(
+            (doc): doc is Broker1Document | Broker2Document =>
+              doc && Object.keys(doc).length > 1,
+          ) // Filter out incomplete documents
+          .map((doc) => {
             try {
               return isBroker1
-                ? standardizeBroker1Data(doc)
-                : standardizeBroker2Data(doc);
+                ? standardizeBroker1Data(doc as Broker1Document)
+                : standardizeBroker2Data(doc as Broker2Document);
             } catch (error) {
               console.error('Error standardizing document:', error, doc);
               return null;
             }
           })
-          .filter((doc: any) => doc !== null);
+          .filter((doc): doc is StandardizedPolicy => doc !== null);
 
         standardizedData = [...standardizedData, ...standardized];
       }

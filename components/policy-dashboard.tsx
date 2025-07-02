@@ -33,10 +33,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PolicyCharts } from '@/components/policy-charts';
 import { PolicyTable } from '@/components/policy-table';
+import { StandardizedPolicy } from '@/app/api/brokers/types';
 
 interface PolicyData {
   success: boolean;
-  data: any[];
+  data: StandardizedPolicy[];
   pagination: {
     page: number;
     limit: number;

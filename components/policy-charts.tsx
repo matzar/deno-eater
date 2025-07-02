@@ -324,16 +324,22 @@ export function PolicyCharts({ data: propData }: PolicyChartsProps) {
           </div>
           <Select
             value={chartType}
-            onValueChange={(value: any) => setChartType(value)}
+            onValueChange={(
+              value:
+                | 'policy-types'
+                | 'client-types'
+                | 'sources'
+                | 'active-vs-total',
+            ) => setChartType(value)}
           >
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select chart type" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="active-vs-total">Active vs Total</SelectItem>
               <SelectItem value="policy-types">Policy Types</SelectItem>
               <SelectItem value="client-types">Client Types</SelectItem>
               <SelectItem value="sources">Sources Comparison</SelectItem>
-              <SelectItem value="active-vs-total">Active vs Total</SelectItem>
             </SelectContent>
           </Select>
         </div>

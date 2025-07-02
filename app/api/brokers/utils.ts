@@ -91,7 +91,7 @@ export function formatCurrency(
 }
 
 // Helper function to validate policy data
-export function validatePolicyData(policy: any): boolean {
+export function validatePolicyData(policy: Record<string, unknown>): boolean {
   const requiredFields = ['policyNumber', 'insuredAmount', 'startDate'];
   return requiredFields.every(
     (field) => policy[field] !== undefined && policy[field] !== null,
