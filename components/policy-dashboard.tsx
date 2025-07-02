@@ -309,26 +309,6 @@ export function PolicyDashboard() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label>Limit</Label>
-                <Select
-                  value={filters.limit.toString()}
-                  onValueChange={(value) =>
-                    updateFilter('limit', parseInt(value))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               <div className="flex items-end">
                 <Button
                   onClick={() =>
@@ -390,7 +370,42 @@ export function PolicyDashboard() {
 
       {/* Policy Table */}
       <div className="px-4 lg:px-6">
-        <PolicyTable data={data.data} pagination={data.pagination} />
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Policy Data</CardTitle>
+                <CardDescription>
+                  Detailed view of all policies matching your filters
+                </CardDescription>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="table-limit" className="text-sm">
+                  Rows per page:
+                </Label>
+                <Select
+                  value={filters.limit.toString()}
+                  onValueChange={(value) =>
+                    updateFilter('limit', parseInt(value))
+                  }
+                >
+                  <SelectTrigger id="table-limit" className="w-[80px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <PolicyTable data={data.data} pagination={data.pagination} />
+          </CardContent>
+        </Card>
       </div>
 
       {/* Pagination */}

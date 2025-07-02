@@ -281,49 +281,28 @@ export function PolicyTable({
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Policy Data</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <CardContent>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
+        </div>
+      </CardContent>
     );
   }
 
   if (error) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-red-600">
-            Error Loading Policy Data
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-sm text-muted-foreground mb-4">{error}</div>
-          <Button onClick={fetchData} variant="outline">
-            Retry
-          </Button>
-        </CardContent>
-      </Card>
+      <>
+        <div className="text-sm text-muted-foreground mb-4">{error}</div>
+        <Button onClick={fetchData} variant="outline">
+          Retry
+        </Button>
+      </>
     );
   }
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Policy Data ({data.length} policies)</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <PolicyDataTable columns={columns} data={data} />
-      </CardContent>
-    </Card>
-  );
+  return <PolicyDataTable columns={columns} data={data} />;
 }
 
 function PolicyDataTable<TData, TValue>({
