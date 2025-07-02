@@ -396,6 +396,8 @@ export function PolicyDashboard() {
           onLimitChange={(limit) => updateFilter('limit', limit)}
           currentLimit={filters.limit}
           onPageChange={(page) => updateFilter('page', page)}
+          onPolicyClick={(policyNumber) => updateFilter('search', policyNumber)}
+          onClearPolicyFilter={() => updateFilter('search', '')}
         />
       </div>
     </div>

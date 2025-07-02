@@ -40,7 +40,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react';
 
 interface StandardizedPolicy {
   id: string;
@@ -90,6 +90,8 @@ interface PolicyTableProps {
   onLimitChange?: (limit: number) => void;
   currentLimit?: number;
   onPageChange?: (page: number) => void;
+  onPolicyClick?: (policyNumber: string) => void;
+  onClearPolicyFilter?: () => void;
 }
 
 export function PolicyTable({
@@ -99,6 +101,8 @@ export function PolicyTable({
   onLimitChange,
   currentLimit = 20,
   onPageChange,
+  onPolicyClick,
+  onClearPolicyFilter,
 }: PolicyTableProps) {
   const [data, setData] = useState<StandardizedPolicy[]>(propData || []);
   const [loading, setLoading] = useState(!propData);
@@ -197,7 +201,9 @@ export function PolicyTable({
       accessorKey: 'policyNumber',
       header: 'Policy Number',
       cell: ({ row }) => (
-        <div className="font-medium">{row.getValue('policyNumber')}</div>
+        <div className="font-medium text-primary hover:underline">
+          {row.getValue('policyNumber')}
+        </div>
       ),
     },
     {
@@ -328,7 +334,8 @@ export function PolicyTable({
           <div>
             <CardTitle>Policy Data ({data.length} policies)</CardTitle>
             <CardDescription>
-              Detailed view of all policies matching your filters
+              Detailed view of all policies matching your filters. Click on any
+              row to filter by that policy number.
             </CardDescription>
           </div>
           {onLimitChange && (
@@ -360,6 +367,8 @@ export function PolicyTable({
           data={data}
           pagination={propPagination}
           onPageChange={onPageChange}
+          onPolicyClick={onPolicyClick}
+          onClearPolicyFilter={onClearPolicyFilter}
         />
       </CardContent>
     </Card>
@@ -371,6 +380,8 @@ function PolicyDataTable<TData, TValue>({
   data,
   pagination,
   onPageChange,
+  onPolicyClick,
+  onClearPolicyFilter,
 }: {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -383,6 +394,8 @@ function PolicyDataTable<TData, TValue>({
     hasPrevPage: boolean;
   };
   onPageChange?: (page: number) => void;
+  onPolicyClick?: (policyNumber: string) => void;
+  onClearPolicyFilter?: () => void;
 }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -391,6 +404,7 @@ function PolicyDataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [localPolicyFilter, setLocalPolicyFilter] = React.useState('');
 
   const table = useReactTable({
     data,
@@ -413,16 +427,32 @@ function PolicyDataTable<TData, TValue>({
   return (
     <div className="w-full">
       <div className="flex items-center pb-4">
-        <Input
-          placeholder="Filter policy numbers..."
-          value={
-            (table.getColumn('policyNumber')?.getFilterValue() as string) ?? ''
-          }
-          onChange={(event) =>
-            table.getColumn('policyNumber')?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="relative max-w-sm">
+          <Input
+            placeholder="Filter policy numbers..."
+            value={localPolicyFilter}
+            onChange={(event) => {
+              const value = event.target.value;
+              setLocalPolicyFilter(value);
+              table.getColumn('policyNumber')?.setFilterValue(value);
+            }}
+            className="pr-8"
+          />
+          {localPolicyFilter && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
+              onClick={() => {
+                setLocalPolicyFilter('');
+                table.getColumn('policyNumber')?.setFilterValue('');
+                onClearPolicyFilter?.();
+              }}
+            >
+              <IconX className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -450,6 +480,20 @@ function PolicyDataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    if (onPolicyClick) {
+                      const policy = row.original as StandardizedPolicy;
+                      const policyNumber = policy.policyNumber;
+
+                      // Update both the global search filter and local table filter
+                      onPolicyClick(policyNumber);
+                      setLocalPolicyFilter(policyNumber);
+                      table
+                        .getColumn('policyNumber')
+                        ?.setFilterValue(policyNumber);
+                    }
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
