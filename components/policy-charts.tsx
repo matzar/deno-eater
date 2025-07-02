@@ -219,7 +219,7 @@ export function PolicyCharts({ data: propData }: PolicyChartsProps) {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="value" fill="hsl(var(--chart-1))" />
+                <Bar dataKey="value" fill="#8884d8" />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -234,16 +234,8 @@ export function PolicyCharts({ data: propData }: PolicyChartsProps) {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="total"
-                  fill="hsl(var(--chart-1))"
-                  name="Total Policies"
-                />
-                <Bar
-                  dataKey="active"
-                  fill="hsl(var(--chart-2))"
-                  name="Active Policies"
-                />
+                <Bar dataKey="total" fill="#8884d8" name="Total Policies" />
+                <Bar dataKey="active" fill="#82ca9d" name="Active Policies" />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -336,8 +328,8 @@ export function PolicyCharts({ data: propData }: PolicyChartsProps) {
               <SelectValue placeholder="Select chart type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="active-vs-total">Active vs Total</SelectItem>
               <SelectItem value="policy-types">Policy Types</SelectItem>
+              <SelectItem value="active-vs-total">Active vs Total</SelectItem>
               <SelectItem value="client-types">Client Types</SelectItem>
               <SelectItem value="sources">Sources Comparison</SelectItem>
             </SelectContent>
