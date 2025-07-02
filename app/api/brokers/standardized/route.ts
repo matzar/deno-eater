@@ -26,26 +26,41 @@ interface StandardizedPolicy {
   updatedAt?: string;
 }
 
+// Helper function to safely parse numeric values
+function safeParseNumber(value: any): number {
+  if (
+    value === null ||
+    value === undefined ||
+    value === '' ||
+    value === 'TBC' ||
+    value === 'Not Known'
+  ) {
+    return 0;
+  }
+  const parsed = typeof value === 'string' ? parseFloat(value) : Number(value);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 // Field mapping functions
 function standardizeBroker1Data(document: any): StandardizedPolicy {
   return {
     id: document._id,
     source: 'broker1',
     policyNumber: document.PolicyNumber,
-    insuredAmount: document.InsuredAmount,
+    insuredAmount: safeParseNumber(document.InsuredAmount),
     startDate: document.StartDate,
     endDate: document.EndDate,
-    adminFee: document.AdminFee,
+    adminFee: safeParseNumber(document.AdminFee),
     businessDescription: document.BusinessDescription,
     businessEvent: document.BusinessEvent,
     clientType: document.ClientType,
     clientRef: document.ClientRef,
-    commission: document.Commission,
+    commission: safeParseNumber(document.Commission),
     effectiveDate: document.EffectiveDate,
     insurerPolicyNumber: document.InsurerPolicyNumber,
-    taxAmount: document.IPTAmount,
-    premium: document.Premium,
-    policyFee: document.PolicyFee,
+    taxAmount: safeParseNumber(document.IPTAmount),
+    premium: safeParseNumber(document.Premium),
+    policyFee: safeParseNumber(document.PolicyFee),
     policyType: document.PolicyType,
     insurer: document.Insurer,
     product: document.Product,
@@ -61,20 +76,20 @@ function standardizeBroker2Data(document: any): StandardizedPolicy {
     id: document._id,
     source: 'broker2',
     policyNumber: document.PolicyRef,
-    insuredAmount: document.CoverageAmount,
+    insuredAmount: safeParseNumber(document.CoverageAmount),
     startDate: document.InitiationDate,
     endDate: document.ExpirationDate,
-    adminFee: document.AdminCharges,
+    adminFee: safeParseNumber(document.AdminCharges),
     businessDescription: document.CompanyDescription,
     businessEvent: document.ContractEvent,
     clientType: document.ConsumerCategory,
     clientRef: document.ConsumerID,
-    commission: document.BrokerFee,
+    commission: safeParseNumber(document.BrokerFee),
     effectiveDate: document.ActivationDate,
     insurerPolicyNumber: document.InsuranceCompanyRef,
-    taxAmount: document.TaxAmount,
-    premium: document.CoverageCost,
-    policyFee: document.ContractFee,
+    taxAmount: safeParseNumber(document.TaxAmount),
+    premium: safeParseNumber(document.CoverageCost),
+    policyFee: safeParseNumber(document.ContractFee),
     policyType: document.ContractCategory,
     insurer: document.Underwriter,
     product: document.InsurancePlan,
