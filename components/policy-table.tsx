@@ -216,7 +216,9 @@ export function PolicyTable({
     },
     {
       accessorKey: 'insuredAmount',
-      header: 'Insured Amount',
+      header: ({ column }) => (
+        <div className="text-right">Insured Amount</div>
+      ),
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue('insuredAmount'));
         return (
@@ -226,7 +228,9 @@ export function PolicyTable({
     },
     {
       accessorKey: 'premium',
-      header: 'Premium',
+      header: ({ column }) => (
+        <div className="text-right">Premium</div>
+      ),
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue('premium'));
         return (
