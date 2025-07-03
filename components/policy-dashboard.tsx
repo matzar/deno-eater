@@ -1,13 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-  IconTrendingUp,
-  IconTrendingDown,
-  IconSearch,
-  IconFilter,
-} from '@tabler/icons-react';
+import { useState, useEffect, useCallback } from 'react';
+import { IconTrendingUp, IconSearch, IconFilter } from '@tabler/icons-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -184,16 +179,16 @@ export function PolicyDashboard() {
     [],
   );
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
+  // const formatCurrency = (amount: number) => {
+  //   return new Intl.NumberFormat('en-US', {
+  //     style: 'currency',
+  //     currency: 'USD',
+  //   }).format(amount);
+  // };
 
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US').format(num);
-  };
+  // const formatNumber = (num: number) => {
+  //   return new Intl.NumberFormat('en-US').format(num);
+  // };
 
   if (loading && !data) {
     return <PolicyDashboardSkeleton />;

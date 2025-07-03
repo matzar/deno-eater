@@ -3,8 +3,6 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Area,
-  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,

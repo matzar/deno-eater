@@ -130,7 +130,7 @@ export async function GET(request: Request) {
     // Make API calls to both broker endpoints
     const baseUrl =
       process.env.NODE_ENV === 'production'
-        ? 'https://your-domain.com'
+        ? 'https://deno-eater.vercel.app/'
         : 'http://localhost:3000';
 
     const promises: Promise<BrokerApiResponse>[] = [];
