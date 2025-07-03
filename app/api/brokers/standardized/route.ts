@@ -114,8 +114,14 @@ function standardizeBroker2Data(document: Broker2Document): StandardizedPolicy {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const pageParam = parseInt(searchParams.get('page') || '1');
+    const limitParam = parseInt(searchParams.get('limit') || '20');
+
+    // Ensure valid pagination values with fallbacks
+    const page = isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
+    const limit =
+      isNaN(limitParam) || limitParam < 1 || limitParam > 100 ? 20 : limitParam;
+
     const source = searchParams.get('source'); // 'broker1', 'broker2', or null for both
     const policyType = searchParams.get('policyType');
     const clientType = searchParams.get('clientType');
