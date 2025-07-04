@@ -1,5 +1,6 @@
 import { MongoClient, MongoClientOptions, ServerApiVersion } from 'mongodb';
 import path from 'path';
+import fs from 'fs';
 
 // Different URIs for different environments
 let uri: string;
@@ -16,10 +17,30 @@ if (process.env.NODE_ENV === 'development') {
   uri =
     'mongodb+srv://random-words.40wbfia.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority&appName=random-words';
 
-  const credentials = path.join(
-    process.cwd(),
-    'certs/X509-cert-6924067380824752665.pem',
-  );
+  // Auto-detect the first .pem file in the certs directory
+  const certsDir = path.join(process.cwd(), 'certs');
+
+  if (!fs.existsSync(certsDir)) {
+    throw new Error(
+      'certs/ directory not found. Please create it and add your .pem certificate file.',
+    );
+  }
+
+  const pemFiles = fs
+    .readdirSync(certsDir)
+    .filter((file) => file.endsWith('.pem'));
+
+  if (pemFiles.length === 0) {
+    throw new Error(
+      'No .pem certificate file found in certs/ directory. Please add your MongoDB X.509 certificate.',
+    );
+  }
+
+  if (pemFiles.length > 1) {
+    console.warn(`Multiple .pem files found in certs/. Using: ${pemFiles[0]}`);
+  }
+
+  const credentials = path.join(certsDir, pemFiles[0]);
   options.tlsCertificateKeyFile = credentials;
 } else {
   // Production: Use password-based URI from environment variable

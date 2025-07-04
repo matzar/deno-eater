@@ -111,6 +111,122 @@ function standardizeBroker2Data(document: Broker2Document): StandardizedPolicy {
   };
 }
 
+/**
+ * @swagger
+ * /api/brokers/standardized:
+ *   get:
+ *     summary: Get Standardized Broker Data
+ *     description: >
+ *       Fetches data from both broker collections, standardizes it into a unified format,
+ *       and returns the combined list with pagination, filtering, and comprehensive statistics.
+ *     tags:
+ *       - Standardized Data
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 20
+ *         description: Number of records per page
+ *       - in: query
+ *         name: source
+ *         schema:
+ *           type: string
+ *           enum: [broker1, broker2]
+ *         description: Optional. Filter by data source (broker1, broker2, or both if omitted)
+ *       - in: query
+ *         name: policyType
+ *         schema:
+ *           type: string
+ *         description: Optional. Filter policies by their type
+ *       - in: query
+ *         name: clientType
+ *         schema:
+ *           type: string
+ *         description: Optional. Filter policies by client type
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Optional. Search term to filter by policy number, business description, insurer, or client reference
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved standardized policy data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       source:
+ *                         type: string
+ *                         enum: [broker1, broker2]
+ *                       policyNumber:
+ *                         type: string
+ *                       insuredAmount:
+ *                         type: number
+ *                       premium:
+ *                         type: number
+ *                       policyType:
+ *                         type: string
+ *                       clientType:
+ *                         type: string
+ *                       insurer:
+ *                         type: string
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     totalCount:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     hasNextPage:
+ *                       type: boolean
+ *                     hasPrevPage:
+ *                       type: boolean
+ *                 statistics:
+ *                   type: object
+ *                   description: Comprehensive statistics about the filtered data
+ *                 metadata:
+ *                   type: object
+ *                   description: Additional metadata about data quality and sources
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

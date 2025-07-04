@@ -1,28 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Data Dashboard - Broker Policy Management
+
+<video width="100%" controls autoplay loop muted>
+  <source src="public/app-overview.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+> A Next.js-powered data dashboard for aggregating and visualizing policy information from multiple broker systems.
+
+This project is built with [Next.js](https://nextjs.org) and uses [shadcn/ui](https://ui.shadcn.com/examples/dashboard) components for a modern, responsive interface.
+
+## Overview
+
+This application is a data dashboard designed to aggregate, standardize, and display policy and client information from multiple, disparate broker systems. It connects to a MongoDB database to fetch raw data, processes it through a series of API routes, and presents it in a clean, interactive user interface featuring tables and charts.
+
+## Features
+
+- **Interactive Dashboard**: Provides a user-friendly interface with tables and charts for data visualization.
+- **Data Standardization**: Combines and transforms data from multiple broker systems into a consistent format.
+- **API Documentation**: Explore and test API endpoints using Swagger UI.
+- **Environment-Specific Authentication**: Supports X.509 certificate authentication for development and username/password authentication for production.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+Ensure you have the following installed:
+
+- Node.js 22.17.0 or higher
+- pnpm (recommended package manager)
+
+**Installing pnpm:**
+If you don't have pnpm installed, you can install it using one of these methods:
 
 ```bash
-npm run dev
+# Using npm
+npm install -g pnpm
+
+# Using Homebrew (macOS)
+brew install pnpm
+
+# Using curl
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+```
+
+For more installation options, see the [pnpm installation guide](https://pnpm.io/installation).
+
+> **Note:** npm is not supported due to dependency resolution conflicts with React 19. Please use pnpm, yarn, or bun.
+
+### Installation
+
+Install the dependencies using pnpm:
+
+```bash
+pnpm install
+```
+
+**Alternative package managers:**
+
+```bash
+# For pnpm
+pnpm install
+
+# For yarn
+yarn install
+
+# For bun
+bun install
+
+# For npm
+npm install --legacy-peer-deps
+```
+
+> **Note:** npm is not officially supported due to dependency resolution conflicts with React 19. If you use npm, you must run `npm install --legacy-peer-deps` and use Node.js 22.17.0 or higher.
+
+### Running the Development Server
+
+Start the development server:
+
+```bash
+pnpm dev
 # or
 yarn dev
 # or
-pnpm dev
-# or
 bun dev
+# or
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-This project uses shadcn/ui components, and builds on top of the [Dashboard example](https://ui.shadcn.com/examples/dashboard).
+## Technology Stack
 
-To run it in development mode, copy the `env.local.example` file to `.env.local` and set the `MONGODB_URI` variable to the MongoDB connection string sent to you via email.
+This project uses [shadcn/ui](https://ui.shadcn.com/examples/dashboard) components, building on top of the [Dashboard example](https://ui.shadcn.com/examples/dashboard).
 
-To run it in production mode, copy the `env.production.local.example` file to `.env.production.local` and set the `MONGODB_URI` variable to the MongoDB connection string sent to you via email.
+## Data Setup
 
-## Overview
+The `.csv` files were imported into the MongoDB database using [MongoDB Compass](https://www.mongodb.com/products/compass). During the import process, `Ignore empty strings` was **not** checked to ensure that all data is imported, including empty fields. This allows the application to handle missing data gracefully.
+
+To connect to the MongoDB database, you need to set up the environment by following the instructions below.
+
+## Environment Setup
+
+This project uses different authentication methods for development and production environments:
+
+### Development Environment (X.509 Certificate Authentication)
+
+1. **Create the certificates directory:**
+
+```bash
+mkdir -p certs
+```
+
+2. **Download the certificate file:** Download `X509-cert-6924067380824752665.pem` from 1Password and place it in the `certs` folder at the project root.
+
+3. **No environment file needed:** Development mode automatically uses the certificate file for MongoDB authentication.
+
+### Production Environment (Username/Password Authentication)
+
+Create `.env.production.local` in the project root, copy the contents of `.env.production.local.example`, and replace `<1Password MongoDB connection string>` with the actual MongoDB connection string from 1Password.
+
+```bash
+cp env.production.local.example .env.production.local
+```
+
+## Architecture
 
 This application is a data dashboard designed to aggregate, standardize, and display policy and client information from multiple, disparate broker systems. It connects to a MongoDB database to fetch raw data, processes it through a series of API routes, and presents it in a clean, interactive user interface featuring tables and charts.
 
@@ -43,6 +144,11 @@ The core logic is handled by several serverless API routes within the `app/api/`
 
 ## API Documentation
 
+<video width="100%" controls autoplay loop muted>
+  <source src="public/docs.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 This project uses [Swagger](https://swagger.io/) to provide interactive API documentation.
 
-[View the API Documentation](./app/docs/page.tsx)
+To explore the API, navigate to the `/docs` route in your browser - http://localhost:3000/docs. This will display the Swagger UI, allowing you to interact with the API endpoints, view request and response formats, and test the API directly from the browser.
