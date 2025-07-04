@@ -16,21 +16,33 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This project uses shadcn/ui components, and builds on top of the [Dashboard example](https://ui.shadcn.com/examples/dashboard).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To run it in development mode, copy the `env.local.example` file to `.env.local` and set the `MONGODB_URI` variable to the MongoDB connection string sent to you via email.
 
-## Learn More
+To run it in production mode, copy the `env.production.local.example` file to `.env.production.local` and set the `MONGODB_URI` variable to the MongoDB connection string sent to you via email.
 
-To learn more about Next.js, take a look at the following resources:
+## Overview
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This application is a data dashboard designed to aggregate, standardize, and display policy and client information from multiple, disparate broker systems. It connects to a MongoDB database to fetch raw data, processes it through a series of API routes, and presents it in a clean, interactive user interface featuring tables and charts.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### API Routes
 
-## Deploy on Vercel
+The core logic is handled by several serverless API routes within the `app/api/` directory:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **/api/broker1** & **/api/broker2**:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+  - These routes connect directly to a MongoDB database (`brokers`) and fetch data from their respective collections (`broker1` and `broker2`). They serve the raw data for each broker system.
+
+- **/api/brokers/standardized**:
+
+  - This is the primary data endpoint for the frontend dashboard. It fetches the raw data from the `broker1` and `broker2` endpoints, transforms their different data structures into a single, standardized format, and returns the combined data. This allows the frontend to work with a consistent data model, regardless of the source.
+
+- **/api/test-db**:
+  - A simple utility route used to verify that the connection to the MongoDB database is configured correctly and is operational.
+
+## API Documentation
+
+This project uses [Swagger](https://swagger.io/) to provide interactive API documentation.
+
+[View the API Documentation](./app/docs/page.tsx)
