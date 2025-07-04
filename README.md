@@ -1,9 +1,10 @@
 # Data Dashboard - Broker Policy Management
 
-<video width="100%" controls autoplay loop muted>
-  <source src="public/app-overview.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+
+
+https://github.com/user-attachments/assets/6b6354da-7d59-4369-8917-2e1518203c1a
+
+
 
 > A Next.js-powered data dashboard for aggregating and visualizing policy information from multiple broker systems.
 
@@ -144,10 +145,11 @@ The core logic is handled by several serverless API routes within the `app/api/`
 
 ## API Documentation
 
-<video width="100%" controls autoplay loop muted>
-  <source src="public/docs.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+
+
+https://github.com/user-attachments/assets/473721d0-8c0a-498a-af99-c2b8cf255311
+
+
 
 This project uses [Swagger](https://swagger.io/) to provide interactive API documentation.
 
